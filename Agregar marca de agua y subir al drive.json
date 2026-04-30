@@ -1,0 +1,1249 @@
+{
+  "name": "Agregar marca de agua y subir al drive",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1712,
+        -288
+      ],
+      "id": "d3b36f37-351e-4724-be2b-820770bd479d",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "channel_post",
+          "callback_query",
+          "edited_channel_post",
+          "edited_message",
+          "inline_query",
+          "*",
+          "poll",
+          "pre_checkout_query",
+          "shipping_query"
+        ],
+        "additionalFields": {
+          "download": true,
+          "imageSize": "large",
+          "userIds": " 5317310399"
+        }
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2384,
+        144
+      ],
+      "id": "1a38bfeb-f474-412a-b2dd-5be2b72abe68",
+      "name": "Disparador de imagen ",
+      "webhookId": "daf4ff9f-afd1-4332-9dde-1a049ad8d4d1",
+      "credentials": {
+        "telegramApi": {
+          "id": "2wMa7Vs1e2k6XWgF",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fileSelector": "/home/node/.n8n-files/assets/logoByte5.png",
+        "options": {
+          "fileName": "marca_agua",
+          "dataPropertyName": "marca_agua"
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1936,
+        -288
+      ],
+      "id": "cd04dbe2-86c4-49e2-b96f-92853db99b75",
+      "name": "Leer logo",
+      "alwaysOutputData": false,
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "information"
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        -1936,
+        0
+      ],
+      "id": "bf9b21d8-7ea9-409b-8caf-f09345a35d4f",
+      "name": "Info de la imagen de telegram"
+    },
+    {
+      "parameters": {
+        "operation": "resize",
+        "dataPropertyName": "marca_agua",
+        "width": "={{ $json.size.width-100 }}",
+        "height": "={{ ($json.size.width-100)*3247/4501}}",
+        "resizeOption": "ignoreAspectRatio",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        -1488,
+        -288
+      ],
+      "id": "e90dd153-f815-40a7-bcf5-a1a56a7f0718",
+      "name": "Cambio la resolucion del logo"
+    },
+    {
+      "parameters": {
+        "operation": "composite",
+        "dataPropertyNameComposite": "marca_agua",
+        "operator": "Atop",
+        "positionX": "={{ ($('Cambio la resolucion del logo').item.json.size.width - ($('Cambio la resolucion del logo').item.json.size.width-100))/2}}",
+        "positionY": "={{ ($('Cambio la resolucion del logo').item.json.size.height - (($('Cambio la resolucion del logo').item.json.size.width-100)*3247/4501))/2}}",
+        "options": {
+          "destinationKey": "Imagen-completa"
+        }
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        -1040,
+        -224
+      ],
+      "id": "d635d2dd-a01e-4b2b-9a64-3b1658fd483b",
+      "name": "PegoLogoArribaDeParcial",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fc7170db-da96-426f-82cc-1d8015616f5e",
+              "name": "Mensaje de la foto",
+              "value": "={{ $json.message.caption }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -816,
+        144
+      ],
+      "id": "83329770-70fb-4b85-b82c-18fbdbcb16a0",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.caption }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "66e1da54-451b-445e-8f1a-4a719e13d50a"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "66a15008-d5ec-4cae-aa60-62894b58c17d",
+                    "leftValue": "={{ $json.message.photo }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0b9ae6d2-ce7b-4972-8a2f-283b12e508b7",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -2160,
+        128
+      ],
+      "id": "a2434d1a-b565-467a-b5d5-a6893facd8cf",
+      "name": "Es foto o texto"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Disparador de imagen ').item.json.message.caption }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notExists",
+                      "singleValue": true
+                    },
+                    "id": "cec033d5-146c-48ea-8283-1c9d69983a14"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "79375a32-ecbf-4979-afe8-8c4542acee8b",
+                    "leftValue": "={{ $('Disparador de imagen ').item.json.message.caption }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -816,
+        -224
+      ],
+      "id": "55e48958-f3d0-4c2b-b48a-6224831bf25d",
+      "name": "ConTexto o no"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/home/node/.n8n-files/assets/temporal.jpg",
+        "dataPropertyName": "Imagen-completa",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        -592,
+        -272
+      ],
+      "id": "728c7c81-4a6d-4fb3-b2c5-47bf0ff4035b",
+      "name": "Escribir el archivo temporal"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/home/node/.n8n-files/assets/temporal.jpg",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1936,
+        576
+      ],
+      "id": "b9ac4435-b067-4d4c-8044-1d13b03202c8",
+      "name": "Leer el archivo temporal"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1264,
+        -224
+      ],
+      "id": "c5e59f2b-5e20-48de-a524-c356879690a8",
+      "name": "Logo e imagen"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -592,
+        32
+      ],
+      "id": "b7a8ddbf-911f-4275-b5cb-9ac4568588a3",
+      "name": "Archivo listo"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1712,
+        432
+      ],
+      "id": "24fca5d9-b8ae-41bd-a6a1-fbea85a1695c",
+      "name": "Archivo listo1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2e4ae059-9bf2-40b8-bc2f-b3b0ee6a723c",
+              "name": "message.text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1936,
+        288
+      ],
+      "id": "3a751dbf-2105-4254-b283-375f1107f3b1",
+      "name": "NombreSolo"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/home/node/.n8n-files/assets/ParcialesConMarca/{{ $('NombreSolo').item.json.message.text }}.jpg",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1488,
+        512
+      ],
+      "id": "f24f3434-605b-4165-9d27-35136ad530d8",
+      "name": "Escritura en disco sin nombre asignado"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/home/node/.n8n-files/assets/ParcialesConMarca/ {{ $json[\"Mensaje de la foto\"] }}.jpg",
+        "dataPropertyName": "Imagen-completa",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        -368,
+        -80
+      ],
+      "id": "3076304e-6225-428e-945f-3d88a59a2827",
+      "name": "Escritura en diso con nombre asignado"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "Ingrese el nombre del archivo. La modalidad de nombre es: NombreMateria-Año-NumeroParcial (Ej: CADP-2026-1Examen) ",
+        "replyMarkup": "forceReply",
+        "forceReply": {},
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -368,
+        -272
+      ],
+      "id": "a800964d-415e-48e7-b37e-2fcbdd40f6c4",
+      "name": "Mensaje pidiendo nombre",
+      "webhookId": "6354d9c7-6895-4f2b-9caa-48b4d253b16d",
+      "credentials": {
+        "telegramApi": {
+          "id": "2wMa7Vs1e2k6XWgF",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Disparador de imagen ').item.json.message.from.id }}",
+        "text": "¡Archivo procesado y guardado temporalmente! 📁 Para organizarlo en Drive, por favor seleccioná el año de la materia:",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Ingeniería en computación",
+                    "additionalFields": {
+                      "callback_data": "Ic"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Licenciatura y analista",
+                    "additionalFields": {
+                      "callback_data": "LYA"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Ciencia de datos",
+                    "additionalFields": {
+                      "callback_data": "CDO"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        96
+      ],
+      "id": "eaf00b80-ec46-4c1d-b0a6-9c279791ab3e",
+      "name": "Mensaje Archivo Listo",
+      "webhookId": "7207951a-f361-44d8-ad21-1f7ebd8181e2",
+      "credentials": {
+        "telegramApi": {
+          "id": "2wMa7Vs1e2k6XWgF",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Disparador de imagen ').item.json.message.from.id }}",
+        "text": "Ingrese la materia",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "CADP",
+                    "additionalFields": {
+                      "callback_data": "CADP"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Matematica1",
+                    "additionalFields": {
+                      "callback_data": "M1"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Organización de computadoras",
+                    "additionalFields": {
+                      "callback_data": "oc"
+                    }
+                  },
+                  {
+                    "text": "Matematica 2",
+                    "additionalFields": {
+                      "callback_data": "M2"
+                    }
+                  },
+                  {
+                    "text": "Arquitectura de computadoras",
+                    "additionalFields": {
+                      "callback_data": "AC"
+                    }
+                  },
+                  {
+                    "text": "Taller de programacion",
+                    "additionalFields": {
+                      "callback_data": "TP"
+                    }
+                  },
+                  {
+                    "text": "Algoritmos y estructuras de datos",
+                    "additionalFields": {
+                      "callback_data": "AYED"
+                    }
+                  },
+                  {
+                    "text": "Seminario-Programacion",
+                    "additionalFields": {
+                      "callback_data": "SP"
+                    }
+                  },
+                  {
+                    "text": "Fundamentos de organizacion de datos ",
+                    "additionalFields": {
+                      "callback_data": "FOD"
+                    }
+                  },
+                  {
+                    "text": "Diseño de base de datos",
+                    "additionalFields": {
+                      "callback_data": "DBD"
+                    }
+                  },
+                  {
+                    "text": "Orientacion a objetos 1",
+                    "additionalFields": {
+                      "callback_data": "OO1"
+                    }
+                  },
+                  {
+                    "text": "Ingenieria de software 1",
+                    "additionalFields": {
+                      "callback_data": "IS1"
+                    }
+                  },
+                  {
+                    "text": "Introduccion de sitemas operativos",
+                    "additionalFields": {
+                      "callback_data": "ISO"
+                    }
+                  },
+                  {
+                    "text": "Orientacion a objetos 2",
+                    "additionalFields": {
+                      "callback_data": "OO2"
+                    }
+                  },
+                  {
+                    "text": "Matematica 3",
+                    "additionalFields": {
+                      "callback_data": "M3"
+                    }
+                  },
+                  {
+                    "text": "Ingenieria de software 2",
+                    "additionalFields": {
+                      "callback_data": "IS2"
+                    }
+                  },
+                  {
+                    "text": "Programación Concurrente",
+                    "additionalFields": {
+                      "callback_data": "PC"
+                    }
+                  },
+                  {
+                    "text": "Proyecto de software",
+                    "additionalFields": {
+                      "callback_data": "PS"
+                    }
+                  },
+                  {
+                    "text": "Taller de tecnologias de produccion de software",
+                    "additionalFields": {
+                      "callback_data": "ttps"
+                    }
+                  },
+                  {
+                    "text": "Bases de datos 1",
+                    "additionalFields": {
+                      "callback_data": "BD1"
+                    }
+                  },
+                  {
+                    "text": "Conceptos y paradigmas de lenguaje de programacion",
+                    "additionalFields": {
+                      "callback_data": "CPLP"
+                    }
+                  },
+                  {
+                    "text": "Redes y comunicaciones",
+                    "additionalFields": {
+                      "callback_data": "RYC"
+                    }
+                  },
+                  {
+                    "text": "Sistemas y organizaciones",
+                    "additionalFields": {
+                      "callback_data": "SO"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        512,
+        -64
+      ],
+      "id": "0c2c68c5-7d36-4ce1-957b-3be08815cd5d",
+      "name": "Licenciatura Y analistas",
+      "webhookId": "7207951a-f361-44d8-ad21-1f7ebd8181e2",
+      "credentials": {
+        "telegramApi": {
+          "id": "2wMa7Vs1e2k6XWgF",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Disparador de imagen ').item.json.message.from.id }}",
+        "text": "¡Archivo procesado y guardado temporalmente! 📁 Para organizarlo en Drive, por favor seleccioná el año de la materia:",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Ingeniería en computación",
+                    "additionalFields": {
+                      "callback_data": "Ic"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Licenciatura y analista",
+                    "additionalFields": {
+                      "callback_data": "LYA"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Ciencia de datos",
+                    "additionalFields": {
+                      "callback_data": "CDO"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        512,
+        128
+      ],
+      "id": "656920a8-2d9a-43ed-9f30-c302c1fea933",
+      "name": "Ingenieria en computación",
+      "webhookId": "7207951a-f361-44d8-ad21-1f7ebd8181e2",
+      "credentials": {
+        "telegramApi": {
+          "id": "2wMa7Vs1e2k6XWgF",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Disparador de imagen ').item.json.message.from.id }}",
+        "text": "¡Archivo procesado y guardado temporalmente! 📁 Para organizarlo en Drive, por favor seleccioná el año de la materia:",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Ingeniería en computación",
+                    "additionalFields": {
+                      "callback_data": "Ic"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Licenciatura y analista",
+                    "additionalFields": {
+                      "callback_data": "LYA"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Ciencia de datos",
+                    "additionalFields": {
+                      "callback_data": "CDO"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        512,
+        320
+      ],
+      "id": "5248ab81-e7a3-42ac-9380-12709dbf5904",
+      "name": "Ciencia de datos",
+      "webhookId": "7207951a-f361-44d8-ad21-1f7ebd8181e2",
+      "credentials": {
+        "telegramApi": {
+          "id": "2wMa7Vs1e2k6XWgF",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        896,
+        64
+      ],
+      "id": "9468c38b-ff96-465c-b2c7-4505136f4f54",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "eSEMW7VNyFMEFPQj",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "=={{ $json.callback_query.data }}",
+                    "rightValue": "LYA",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "5b4c9ee7-402e-41f9-a08e-834da0bc3c84"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5e706856-2a83-4b8b-bb5a-8e700e259e64",
+                    "leftValue": "=={{ $json.callback_query.data }}",
+                    "rightValue": "Ic",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d2ddcd36-20a2-4f09-bfaf-2ecb653e701c",
+                    "leftValue": "=={{ $json.callback_query.data }}",
+                    "rightValue": "CDO",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        160,
+        80
+      ],
+      "id": "7dec7b86-86cc-4e97-8d03-d47afd5a06bd",
+      "name": "Switch"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Cambio la resolucion del logo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Disparador de imagen ": {
+      "main": [
+        [
+          {
+            "node": "Es foto o texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer logo": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Info de la imagen de telegram": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Cambio la resolucion del logo": {
+      "main": [
+        [
+          {
+            "node": "Logo e imagen",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "PegoLogoArribaDeParcial": {
+      "main": [
+        [
+          {
+            "node": "ConTexto o no",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Archivo listo",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Es foto o texto": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Logo e imagen",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Info de la imagen de telegram",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Leer logo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Info de la imagen de telegram",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Leer logo",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Logo e imagen",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Archivo listo1",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Leer el archivo temporal",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "NombreSolo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ConTexto o no": {
+      "main": [
+        [
+          {
+            "node": "Escribir el archivo temporal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Archivo listo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escribir el archivo temporal": {
+      "main": [
+        [
+          {
+            "node": "Mensaje pidiendo nombre",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer el archivo temporal": {
+      "main": [
+        [
+          {
+            "node": "Archivo listo1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Logo e imagen": {
+      "main": [
+        [
+          {
+            "node": "PegoLogoArribaDeParcial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Archivo listo": {
+      "main": [
+        [
+          {
+            "node": "Escritura en diso con nombre asignado",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Mensaje Archivo Listo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Archivo listo1": {
+      "main": [
+        [
+          {
+            "node": "Escritura en disco sin nombre asignado",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Mensaje Archivo Listo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NombreSolo": {
+      "main": [
+        [
+          {
+            "node": "Archivo listo1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escritura en diso con nombre asignado": {
+      "main": [
+        []
+      ]
+    },
+    "Escritura en disco sin nombre asignado": {
+      "main": [
+        []
+      ]
+    },
+    "Mensaje pidiendo nombre": {
+      "main": [
+        []
+      ]
+    },
+    "Mensaje Archivo Listo": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ciencia de datos": {
+      "main": [
+        []
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Licenciatura Y analistas",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ingenieria en computación",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ciencia de datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "e62a1613-4c31-4fe0-93f5-2fa9dbcc4395",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ffed7e206e7debbeb65b660ad61100ed0287a08a1ea91e91bd358a0b8b510e42"
+  },
+  "id": "D1AkePTJ6y2yL7fK",
+  "tags": []
+}
