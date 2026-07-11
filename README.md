@@ -1,4 +1,4 @@
-# 🚀 Automated Exam Management & Watermarking Workflow with n8n
+# 🚀 Automatizacion de subida de parciales con marca de agua con n8n
 
 Este repositorio contiene un flujo de automatización desarrollado en **n8n** diseñado para optimizar, estandarizar y brandear la recepción y distribución de material académico (exámenes parciales) para la comunidad estudiantil de **Byte** (Facultad de Informática - UNLP).
 
