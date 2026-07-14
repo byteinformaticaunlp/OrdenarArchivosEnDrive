@@ -1,0 +1,959 @@
+{
+  "name": "Marca de agua - Byte",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1408,
+        0
+      ],
+      "id": "f49d1b15-02fc-45e6-a133-09dd38ee97f5",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "channel_post",
+          "callback_query",
+          "edited_channel_post",
+          "edited_message",
+          "inline_query",
+          "*",
+          "poll",
+          "pre_checkout_query",
+          "shipping_query"
+        ],
+        "additionalFields": {
+          "download": true,
+          "imageSize": "extraLarge"
+        }
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2080,
+        288
+      ],
+      "id": "70a22379-1d0a-4a25-8cf4-84a51a53d436",
+      "name": "Disparador de imagen ",
+      "webhookId": "daf4ff9f-afd1-4332-9dde-1a049ad8d4d1",
+      "credentials": {
+        "telegramApi": {
+          "id": "42AtvF8lHRBigGyh",
+          "name": "Bot-Byte-marcaAgua"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fileSelector": "/home/node/.n8n-files/assets/logoByte5.png",
+        "options": {
+          "fileName": "marca_agua",
+          "dataPropertyName": "marca_agua"
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1632,
+        0
+      ],
+      "id": "20d41885-4a2c-46e4-8209-2af5f77cb0b2",
+      "name": "Leer logo",
+      "alwaysOutputData": false,
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "information"
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        -1632,
+        288
+      ],
+      "id": "dd622434-1c4f-402d-8d7e-bae3b9fe72b3",
+      "name": "Info de la imagen de telegram"
+    },
+    {
+      "parameters": {
+        "operation": "resize",
+        "dataPropertyName": "marca_agua",
+        "width": "={{ $json.size.width-100 }}",
+        "height": "={{ ($json.size.width-100)*3247/4501}}",
+        "resizeOption": "ignoreAspectRatio",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        -1184,
+        0
+      ],
+      "id": "0b301e03-ac35-4d29-ae1d-83e292e3b4da",
+      "name": "Cambio la resolucion del logo"
+    },
+    {
+      "parameters": {
+        "operation": "composite",
+        "dataPropertyNameComposite": "marca_agua",
+        "operator": "Atop",
+        "positionX": "={{ ($('Cambio la resolucion del logo').item.json.size.width - ($('Cambio la resolucion del logo').item.json.size.width-100))/2}}",
+        "positionY": "={{ ($('Cambio la resolucion del logo').item.json.size.height - (($('Cambio la resolucion del logo').item.json.size.width-100)*3247/4501))/2}}",
+        "options": {
+          "destinationKey": "Imagen_completa"
+        }
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        80
+      ],
+      "id": "d3566320-47be-49fe-be11-dbe9e9048810",
+      "name": "PegoLogoArribaDeParcial",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fc7170db-da96-426f-82cc-1d8015616f5e",
+              "name": "Mensaje de la foto",
+              "value": "={{ $json.message.caption }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -512,
+        432
+      ],
+      "id": "6aea37be-984f-4628-9baa-038599f490f9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Disparador de imagen ').item.json.message.caption }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notExists",
+                      "singleValue": true
+                    },
+                    "id": "cec033d5-146c-48ea-8283-1c9d69983a14"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "79375a32-ecbf-4979-afe8-8c4542acee8b",
+                    "leftValue": "={{ $('Disparador de imagen ').item.json.message.caption }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -512,
+        80
+      ],
+      "id": "cc1f65ef-14ae-4917-b666-19bd952ec8d9",
+      "name": "ConTexto o no"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/home/node/.n8n-files/assets/temporal.jpg",
+        "dataPropertyName": "Imagen-completa",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        -288,
+        32
+      ],
+      "id": "82abf951-62af-41ce-ad55-1cb1dcadc5cd",
+      "name": "Escribir el archivo temporal"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -960,
+        80
+      ],
+      "id": "f764b6e9-fde1-4ea7-80eb-dd89b838be98",
+      "name": "Logo e imagen"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -288,
+        320
+      ],
+      "id": "c0fa08a9-b909-4d0b-8db0-9238df03474f",
+      "name": "Archivo listo"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/home/node/.n8n-files/assets/ParcialesConMarca/ {{ $json[\"Mensaje de la foto\"] }}.jpg",
+        "dataPropertyName": "Imagen_completa",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        -64,
+        224
+      ],
+      "id": "be73533f-5ac4-4c23-9c2d-b3d7d8c22583",
+      "name": "Escritura en diso con nombre asignado"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "Ingrese el nombre del archivo. La modalidad de nombre es: NombreMateria-Año-NumeroParcial (Ej: CADP-2026-1Examen) ",
+        "replyMarkup": "forceReply",
+        "forceReply": {},
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        32
+      ],
+      "id": "0831645c-8821-4832-a270-2061fbebaa5d",
+      "name": "Mensaje pidiendo nombre",
+      "webhookId": "6354d9c7-6895-4f2b-9caa-48b4d253b16d",
+      "credentials": {
+        "telegramApi": {
+          "id": "42AtvF8lHRBigGyh",
+          "name": "Bot-Byte-marcaAgua"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "Imagen_completa",
+        "name": "={{ $('Disparador de imagen ').item.json.message.caption }}{{ $json.message.document.file_name }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id_carpeta_drive }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        608,
+        192
+      ],
+      "id": "3af5a13b-4de7-4e26-a4b8-4f6758a04feb",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "gLuLdsoPiXRTdI62",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const BaseDatos = {\n  \"Coc-1-1\":\"1DaGJ63aGAoBQEWgRFLZSR1Sdx12iJ4ZX\",\n  \"Epa-1-1\":\"15ldJnrcXBSqVw2Ut4VdGGV9rNm_hvcGS\",\n  \"M0-1-1\":\"1WXId5-aKpPxJxZL8JAFyO01sy3WJm4XO\",\n  \"Cadp-1-2025\": \"1OslnGt2xIsg9IXebmGrIiTOSCvdj8soI\",\n  \"Cadp-1-2026\": \"1QiD7tdqOnmsSj0X5G3BQupf8LI14xDRQ\",\n  \"Cadp-2-2023\": \"1XgYNGvZT-nsaur3VDnTffywuCh2dUneQ\",\n  \"Cadp-2-2024\": \"1F5CgE7DxjndL2f1Nou2Ouq5qF8U5jHk8\",\n  \"Cadp-2-2025\": \"15xIKvLqOjyc-Ua-cBLT_vOczi5gSPYf4\",\n  \"Cadp-2-2026\": \"1g5LUuulqlo1GPOOpYI4SE8YOuKJpn-VC\",\n  \"Cadp-R-C\": \"16qQeD1cHoLIjTweiG3UHAnQNcDbyVA5J\",\n  \"Ac-1\":\"1x_GIPaZbfrugEi8c9hdkNr0-S98-mpO3\",\n  \"Cadp-P-P\": \"1v8SLNrRguqiCglvbrBR6CPkUSAYMEZlI\",\n  \"Ac-1-2023\":\"1_RAKOZEqFD1kuD0cSKi6i3p36ttn3y_L\",\n    \"Ac-1-2024\":\"1uIOrtglcKYAsTBmvfClwIye3grW5WZyn\",\n    \"Ac-1-2025\":\"14TadX_oLUFzvOnX0pzJDM6gRn5TAxb1r\",\n    \"Ac-1-2026\":\"1kKxM330MUg_mFaSXnlWCCpr1sa2hYdpY\",\n  \"Ac-2-2023\":\"1ZyDwyYxlwUjltMhRaz7louFp2pOZMZJJ\",\n    \"Ac-2-2024\":\"1Gh6P8G-OT-VIqWevEbYxf5U_0Z2ldMXM\",\n    \"Ac-2-2025\":\"1GtE3dZI_bi8DcfpIi5cCpVJFdfq5h9MZ\",\n    \"Ac-2-2026\":\"126wZqHodPODQGNZMVycR8YOs9lktn2g9\",\n  \"Oc-1-2023\":\"1aanBYelW05_pelhwBZgBo8DU8Nyo2ABZ\",\n  \"Oc-1-2024\":\"1LZPCcAOc2QG0zXLnGezr4OlPagk75R4x\",\n  \"Oc-1-2025\":\"1byucCJUEfnje4BIMsGZ-oGOi8pukbDtL\",\n  \"Oc-Global\":\"1D-g9aNYC3bPQi3ew4TklDQp_DT19uGdq\",\n  \"Oc-1-2026\":\"1spWonG2ed-SMuUwoyqjjul3J6-xhDwXQ\",\n  \"Oc-2-2023\":\"14CSg3ReTs1NbLESCh05Fz0itg_NwlA3y\",\n   \"Oc-2-2024\":\"1NBWbR4dSI_e4E1Gayv2z_dtZhYFU3yd-\",\n   \"Oc-2-2025\":\"1yQvR90OVb03W0YLQBW2we5lWk5iKC-8U\",\n   \"Oc-2-2026\":\"1qKT4HmO79l-ZasrnWALu5APbkUznvQ9p\",\n  \"M1-1-2023\":\"1O3xLp4gJ0LPZQqrCQHCvjkCWvpnq8LvH\",\n  \"M1-1-2024\":\"1XfeDZALO5Q8N1fD_Bbh5VXK2GagnF4j5\",\n  \"M1-1-2025\":\"1mgehTSAxNbkdp6IydQUc6vhAfKPZ-t7n\",\n  \"M1-1-2026\":\"1iFWrZmKumKUNIGEvLjIZECtfwEjsx3d4\",\n  \"M1-2-2023\":\"1N3MZgUzG3JdbUw_yGkY_xe0t-B_XIsws\",\n  \"M1-2-2024\":\"1nPDVC2pLShxIO7Z5NQOJb7oyWGohiBgW\",\n  \"M1-2-2025\":\"/15a3iyovHVGcQRRFNJJI8oxsIUH-usuFT\",\n  \"M1-2-2026\":\"1akyiha1mZQmRTjIKDiu130UHIZfw90jl\",\n  \"M2-1-2023\":\"1qpv4GicKlLXZhTOm-QBZnjRWfmnzCjtM\",\n  \"M2-1-2024\":\"1-cr5sDG7HDi9WdZFxc_JLoITdFK6aCB8\",\n  \"M2-1-2025\":\"1NyddxZ2uKNp2-9AfuT1-p4OuEMuPlyQS\",\n  \"M2-1-2026\":\"1lBGYRmG8d4OvLmcpDy9Tiz_A6D9Vfxix\",\n  \"M2-2-2023\":\"1TfAQrn877b15UyJeUtOIa7esURaKmqdp\",\n  \"M2-2-2024\":\"1FKjqFo-_K8J5L9UiXyVNKeSkST_EYQrB\",\n  \"M2-2-2025\":\"1zOXrEVX3AL9kIJJsZCjMonrS4sw14KJy\",\n  \"M2-2-2026\":\"1gP_9Q14OLQyaiE1n38pc5Q3WbrDHUEbV\",\n  \"TP-1-2023\":\"1TWCToT5vZHWRSuDMGNUSw4AqnzjeFaC9\",\n  \"TP-1-2024\":\"11xmm3QT19vVpUq9aCu0R-bsO-n3BWdFs\",\n  \"TP-1-2025\":\"1xn56gt2k_v2Fc7BqbPvgFv76I-UO4UmT\",\n  \"TP-1-2026\":\"11a8-ZwccxpWwuEsWOUIV5Gu66G6celHQ\",\n  \"TP-2-2023\":\"1vQR4_UvitY3ZklzVKWb-KRg2mGmyOAEX\",\n  \"TP-2-2024\":\"1JR0AsHXMhZGcHL6lG6lY18CNXj8-LDpX\",\n  \"TP-2-2025\":\"173Fp6NLaE2hcX-gtZwwAg_yvxx_1bQOl\",\n  \"TP-2-2026\":\"1khOXUWDU-FlTkKAh3HDURjN0EiPWQmjA\",\n  \"TP-3-2023\":\"1WChLlxEIsKDJzKVNtA857Gh2xvshWZpD\",\n  \"TP-3-2024\":\"1veLyZQKpXScg6Ba5Pns4t8UwkpBVQJX0\",\n  \"TP-3-2025\":\"1Nt-nFoX3eO4xqZ9p_09R8KymHuuDShaP\",\n  \"TP-3-2026\":\"1eaz-ENEBcWBwSGJPiLg-X6Hiidp4Uf89\",\n  // segundo año\n  \"Ayed-2023\":\"1XdpLmp85bn5uYVkTlgJBbvEGfXyOTIiO\",\n  \"Ayed-2024\":\"1ZH4PBo7SbggpLtkmR1U_xaU5CwJqfosu\",\n  \"Ayed-2025\":\"1LW_egucBW4zKFssQHCcF3mhmKRIbLWG6\",\n  \"Ayed-2026\":\"1ZULS6v4OyOzBRm7op0VO2uqp8M3Myfdq\",\n  \"I1-2023\":\"1Q8HFgCtGN_N9bgh8nfYsNDYAsIz9Udql\",\n  \"I1-2024\":\"1j45bxm3zJbIYNXbgf-YYd06kTzY7N3HE\",\n  \"I1-2025\":\"1c1OufRA1_n4AjXkTszD2WQF64f157lNS\",\n  \"I1-2026\":\"1bv7H4AvCBNy6WghsmjCN1zbQdnsWhacm\",\n  \"O1-2023\":\"1SlrVtXLUWudPCg-_GRuLzbG_hMSsAg-k\",\n  \"O1-2024\":\"1QCi8ZkCtoD66FLU8js_mVUtZbBgqdw2F\",\n  \"O1-2025\":\"1F4Jp-onRAJVC1bgOLdJ9Ce35hKG59nNc\",\n  \"O1-2026\":\"11r01siWkBJFGYytk32_k0BVGndEEExRK\",\n  \"Fod-2023\":\"179JpwFt_RkMfcweQw6zy-ZLDBvujgJzk\",\n  \"Fod-2024\":\"1PpbcqzWPozFLrjlLcu204Lv0EOLvE31o\",\n  \"Fod-2025\":\"1nMArcLO2Tdl2MsN1rTGBawJr_bxUR54L\",\n  \"Fod-2026\":\"13GyhVqR9sXtLLMqNgGF7pmR-R9ob0gwW\",\n  \"Dbd-2023\":\"1BPXzQmNM5TgVnBy7tYiGV7BulqIxlCXx\",\n  \"Dbd-2024\":\"1WLs0sZ2rd-Dodni0zzpHK4SC8Lob_XhO\",\n  \"Dbd-2025\":\"1Y5RcSJhXzYZBnne2SxhCW2S0tqnJG3Xd\",\n  \"Dbd-2026\":\"1uHURI2G97GXqZWi4mmUQyY9tyAU-Fx5G\",\n  \"Iso-1-2023\":\"1KHdwII2bUMcbZw2DANtLzQo6VtWaWkST\",\n  \"Iso-1-2024\":\"1SHVSBTRCPsnz2oL3f3uZLjxuqql930p9\",\n  \"Iso-1-2025\":\"1ppdjqVJR2mQ2BTPhv3Nntoe5TKpaKMcT\",\n  \"Iso-1-2026\":\"1qfsLBj67TCnimAkz0ChF6ckKLBA2FcDU\",\n  \"Iso-2-2023\":\"1IgJe6-bj4ZXww-u0OhaRvq9m-RSeaVwA\",\n  \"Iso-2-2024\":\"16Is2kg8b6bYI6iDvWy05LyhXNjFjPTHM\",\n  \"Iso-2-2025\":\"1v20wvUpvicAPveje1CMhkhjwXF0ZlSGX\",\n  \"Iso-2-2026\":\"15Sa5PI4kar0npcv2jkJGQlgI3YB2yOrG\",\n  //tercer año\n  \"M3-1-2023\":\"1OlhJ1izJnZhnvpdb8q2LGWF9K4EfOjhN\",\n  \"M3-1-2024\":\"1xJmgY1pMa2K6HPaFg9nSIYYGdNlh96nz\",\n  \"M3-1-2025\":\"1yu_AvxDqJ15QJ8qKndL_AeEHcPHCq5b6\",\n  \"M3-1-2026\":\"14tczCgXq9eruV0-PVZ_cq2AUBmCkH9IS\",\n  \"M3-2-2023\":\"1-1VT5jQugQl-Fy4wjZ6Ejrit0YuUSsO9\",\n  \"M3-2-2024\":\"1jQRsSf0Oe3wfIQsF3prxWuNIN2j1MjBN\",\n  \"M3-2-2025\":\"14yzVIbqvOmSBs5p6H48WZ34jOm3yAE8J\",\n   \"M3-2-2026\":\"1Mfn0mxVru4Uq8iuCu7UuwndUj-sxYR_y\",\n  \"O2-2023\":\"1jVqw35qPttPOFdT-b3y9TdOW7unFWOPi\",\n  \"O2-2024\":\"1jFX1ovIW1tOiHuJh7BcD8rXZpCsRV9sN\",\n  \"O2-2025\":\"1VuE6Z34xq4R-FC3UBsRszKai9Bv0xNau\",\n  \"O2-2026\":\"1fBAT-K4KFzra406hFhAWqsHVMWMcRdyE\",\n  \"Bd1-2023\":\"1-Td6EVEkrEEDTQTqGPxTSVoFEmRf6pod\",\n  \"Bd1-2024\":\"1AfpfhIxN0ZovU9mWC-O8rb0pBQYyQGgy\",\n  \"Bd1-2025\":\"1QUM6Pq0vG9NKX0cm_igZFU6NDK2HmqsR\",\n  \"Bd1-2026\":\"1vJodzNMX8nuL187ZV9PjG26S2Jignzp3\",\n  \"Pc-2023\":\"1gL3VbdsjWZqsZnr3SAVdsxXZuw0Q_veX\",\n  \"Pc-2024\":\"1XfHAIjJMhf7wiPIJ8pcqaTY-EyoN3IRu\",\n  \"Pc-2025\":\"11myGrErOkLOmeKdx_NH3BWevOHynrL1M\",\n  \"Pc-2026\":\"17D9jPco01bpg8Z73olgCku9PzPz2N58Q\",\n  \"Ryc-2023\":\"1wYDhgQ3Y58dUTj6NcjLiFMvdJK9MsS6p\",\n  \"Ryc-2024\":\"1JBQRtmsvDGevbZAIydE1Bd6fskwQov6o\",\n  \"Ryc-2025\":\"1tUG_hsRl16Cvo7qFI94c7yeh-0VSgu4P\",\n  \"Ryc-2026\":\"1156V8LcH-opCnu11_jTVG5Pfguk13IKb\",\n  \"Cyc-2023\":\"1UAQAJ0ZBC--dYsM3pHmwufLf1d5do7jP\",\n  \"Cyc-2024\":\"1xptqW5VTRIgTZappE_k4dxngjLb9Trr8\",\n  \"Cyc-2025\":\"1aPF9bY3QM2ogqRYGigkLvbJITHU86AGy\",\n  \"Cyc-2026\":\"1_aIN0277In36_C4wOTNa4jyeceadeR4u\",\n  \"Cplp-1-2023\":\"1RZgz4BR3KgItB3ClwzrPAVM5-oX8FFfD\",\n  \"Cplp-1-2024\":\"1Yi9WpZiVTman5BlYLgUKSHzG-hB4TX-e\",\n  \"Cplp-1-2025\":\"13MLVl5zYLxwG-7gxdkr6RWRHmqu7-Y8X\",\n  \"Cplp-1-2026\":\"13SenpkJJAY7hOGbCWu1qyPe9fbpCdTWI\",\n  \"Cplp-2-2023\":\"1A1cs6WikoU7GENEM2qMTUxkignxse3bD\",\n  \"Cplp-2-2024\":\"1sLoqLQOXMY--H7oS7v1_Lr9BZT_ZJcdU\",\n  \"Cplp-2-2025\":\"1t1xNRiJ-Q4tnNYINalmw1_I6Uh88kFy5\",\n  \"Cplp-2-2026\":\"159r07db1L2Sthg_r5f8EyKerfGl461VT\",\n  //ATiC orientaciones\n  // Cuarto año\n  \"Syo-2023\":\"1tDG-bglv5ymyeTxYUDlHsntJehniLCpd\",\n  \"Syo-2024\":\"1k5Bp38qRKGO38NyPhfZ-23Ga1xp5v6CP\",\n  \"Syo-2025\":\"1ZEuy4hgU3ln1fsnH6Qu6ukgge5m-zQcj\",\n  \"Syo-2026\":\"19bbNHZsdHDbnRo7WIIkJerHRTa5eTeJO\",\n  \"Sp-2023\":\"1YwgPIdvIQuUxBWksvtWLeex15nc-HEUw\",\n  \"Sp-2024\":\"1KccpUB9yBGPPiCUF23ZKwj5yqPMn9ft8\",\n  \"Sp-2025\":\"1epSQ4wiTg8mHRcx04iQ2od4R4BpNLpkk\",\n  \"Sp-2026\":\"1FooagrSYGJg9gibfWW0vAAW7VQh7KY9_\",\n  \"So-2023\":\"1X0i26sBzZYiW7V5TuQRwL8Nul6I1bs7Y\",\n  \"So-2024\":\"1-i_gR4U-3pZz8_-Tas59wBphzLEi_NJr\",\n  \"So-2025\":\"1kxZe5KuTb79taUH67y5JTuSE0yJcO4RY\",\n  \"So-2026\":\"1OLTRLelvJD36VmXUKML6YyWj3sxTJgZ9\",\n  \"Pdtr-2023\":\"1zm5svz5BrkdiCWx4qFmjVyZdBdE4kwyP\",\n  \"Pdtr-2024\":\"1kmJ2x6ggbmaybmqH5kawYSpYIwH9SBzX\",\n  \"Pdtr-2025\":\"1N3hBy0FzfBqCWAn1psQ88NYvY7O5BNBg\",\n  \"Pdtr-2026\":\"13MfMNMOLBJs4K-JVieyO1tIGtJmph1lv\",\n  \"M4-1-2023\":\"1u2YU71NYOcmHUqfwyvNo-PclcBNqNEAU\",\n  \"M4-1-2024\":\"13xdMYbCLw7_bJ4A4AGsrJskkHUdCeTZH\",\n  \"M4-1-2025\":\"1M8Yd-isU_RDJELj5wAeptRQGAWcMwXKB\",\n  \"M4-1-2026\":\"1G5XNaiyIPyDdqn0Fnir0Ax0mHeDjnUUv\",\n  \"M4-2-2023\":\"1KNCKNlE8vdtatqLZPbH3w0oCe_FkfDlx\",\n  \"M4-2-2024\":\"1BeympCvW-zU0Hq1BpmnlfaQ1LrjUxyTa\",\n  \"M4-2-2025\":\"1V7wPIcv92UlCqTlbHauX1_CqK7-GPRi5\",\n  \"M4-2-2026\":\"1T0F4sQ-X1QmZWzEfvzzyEZ_svow5D0WL\",\n  \"Li-2023\":\"1QpLSzLCaB9E_GmnATR6YBsxveE7da4t7\",\n  \"Li-2024\":\"1hK42SMsnjamghlsB8J_w2Nj-N8jqkJt2\",\n  \"Li-2025\":\"1mhPG92sEM_1lSrmjYvE8PRoSorDR6Lml\",\n  \"Li-2026\":\"1jNOj_1-tlTz1jcA8ker4-Yc6vwIsXnVt\",\n  \"I3-2023\":\"1-uKNVxZpT6NYYDOoH57w4o04pSps8H-R\",\n  \"I3-2024\":\"1A4vgNtMYXTBOySlyfySSZ50QourWRqLJ\",\n  \"I3-2025\":\"19lvfKMlPpkEB4ia112x-2y3I95zp2Taz\",\n  \"I3-2026\":\"1I16YST3LnrgCLZVTL7b_5gPTH8XZujo2\",\n  \"Dssd-2023\":\"1E2uVgfw8d-Yzt_Bru6NtbCXE56uDaY9e\",\n  \"Dssd-2024\":\"1I5JSnfYBoDyF_GXF1awOU-DYxy0VCnqe\",\n  \"Dssd-2025\":\"1tfKW5ApnoK-RCVRPTLN8PNrlKnZtfiJV\",\n  \"Dssd-2026\":\"1ZRTFcjNafl2J5MDhBohTWu4HHgO_PAEw\",\n  \"Bd2-2023\":\"1qt3K2_sZr52fMvrfoe6A4ur4b3o3nXJJ\",\n  \"Bd2-2024\":\"1e69zBOZuBAXeuo-YTFr-1GWysj2kxuW0\",\n  \"Bd2-2025\":\"1KZ45h4AaSoGEiOIkbFFB5J2gXmvPazNw\",\n  \"Bd2-2026\":\"1QKMLNvYcc0rfYfi0ulnzsFk9B4BBma2a\",\n  \"Tcvp-2023\":\"1b7uC2imV899n4RYHI32OzPCtxpALX8oW\",\n  \"Tcvp-2024\":\"1rBIfUr5R4RM_2owpaO3fmvq8VlfAOdbV\",\n  \"Tcvp-2025\":\"12k8Arh4spgYq3YW3eMcZSFcTYcE7gzcw\",\n  \"Tcvp-2026\":\"1XClpeJefnSDuiH_4JAQ5Pv3SagfdTZDz\",\n  \"Ftc-2023\":\"1jWQu0JS9d32kejLuFIy3CfTTQ2X3CYIX\",\n  \"Ftc-2024\":\"1GXugyzh5euTUbg6TQwqDMZ6I1vKJHtSF\",\n  \"Ftc-2025\":\"1gyUD6Ps8IAGC1MkBT59l5Kw-b8OL6Qt7\",\n  \"Ftc-2026\":\"1JN0h5nrQLUbr-6-BkKWXbotTbkRLFTss\",\n  // 5 año\n  \"Aes-2023\":\"1Vw2HhC0aGNYLmtUi_8ycWjMupG_NZlAK\",\n  \"Aes-2024\":\"1WsX170uSVSonU2TfzCnytBfwqjsz37Nk\",\n  \"Aes-2025\":\"1jp-lQdOptcWw9jIzuSwukLjplzCQ3R0_\",\n  \"Aes-2026\":\"1zkYF2ibuLsEPCOkSGcThkRiF1nAsaxPP\",\n  \"As-2023\":\"1Vm8Sn_1D0QmaRigKcNGXMV6IvHHZVC8w\",\n  \"As-2024\":\"1HtN1S-rrSEKgDKJMS3evTmOiSRVWCFnU\",\n  \"As-2025\":\"1VQXPrxBDnwBP6jopzc9YW3u-DM73PymT\",\n  \"As-2026\":\"1gSmDbV2kW_ncrRf3liZtz5Lwv34zO15P\",\n    \n  // Rutas Ciencia de datos\n  //primer año\n  \"Cdo-ayp1\":\"1T0unE30XvOZmu9bViDuR5XKkMQoeG7DA\",\n  \"Cdo-ayp2\":\"1JOo7Ax-AM0tOTvywuE5oxiet_Cj8sYm0\",\n  \"Cdo-matea\":\"1gQuDbdC3mkF6dpE6TLzHvL8wpJ5oHrZU\",\n  \"Cdo-mateb\":\"1n0FTfsCcsrpPyAQ-Lcvf1foFcyBEDh2q\",\n  \"Cdo-economia\":\"1dzdVDQy9vWRKUlLcmtMuLUnmMkkbgwr8\",\n  \"Cdo-gestion\":\"1grihpfuheZFQORYGclCoZ8c1XxQg6y84\",\n  // segundo año\n  \"Cdo-bd\":\"17RYDsvj_dn7O2viKX-7y4I-j1WtPZ7Cx\",\n  \"Cdo-ci\":\"1Eivf8gwOBnXbisZVryjjToN_JkOCiNiK\",\n  \"Cdo-ibd\":\"1eqpaq0u32PxypyJB1p739L195MIiOCOR\",\n  \"Cdo-matec\":\"1qk4FX0OnHJ_nvZXWSaZvfWm7am-G7Zmj\",\n  \"Cdo-mated\":\"1Z6zoML6NzZPOLh_6Vhwvpsc9o_NCWLZx\",\n  \"Cdo-pn\":\"1IjHAhK-SDiNG-50LgwSyqWMHFGT1uyDS\",\n  \"Cdo-tl\":\"1lRQvEJL20n9yYxK5mVgvj7J1VeOuv3s_\",\n  // tercer año\n  \"cdo-Vgvd\":\"1SoEdGCeSSuUFUGIClGUuTmKGA5GU4Nza\",\n  \"cdo-cig\":\"1cpJ1gQCB1sUIBsu65Igey0LH23hNyKWJ\",\n  \"cdo-facso\":\"150lszhFKG_XUACoXS7Eze4goVh4a-q7v\",\n  \"cdo-gpe\":\"1i2EDBXnrutaonyAb9FwIUT-PtIiZgIZ6Zau6\",\n  \"cdo-is\":\"1bDP45AI-5cyzW-ttXuyzrGbnq5oqAzph\",\n  \"cdo-mdaa\":\"1OGbLJPNTVKxQi7kjBAcN5mMgur8Te8Zg\",\n //cuarto año\n  \"cdo-aido\":\"1cQh2g6xBpFMZdACaB9gz6x0j0JHrC3QM\",\n  \"cdo-cabg\":\"1bsdrkBoIY3YVQETRe93aqbScyZT4PYn2\",\n  \"cdo-dg\":\"1DRmsKgwLVPzy_YcBIgEgOUVojztcodko\",\n  \"cdo-etgp\":\"1KSjoicOP2F2TaJUCxeGQzGmf1dPjjoKT\",\n  \"cdo-fe\":\"1k4fQwZcUzvKJ5zUMHeW33RisS1XukZOM\",\n  \"cdo-meo\":\"1raTap3NsrrutaPPEOPYukG1zCf58Kt5dVtprutax\",\n\n\n\n  //Rutas Ingenieria en computación\n  //ingreso\n  \"Ic-matepi\":\"1zuc5YSudx_VAMgE_Ltzkot9AkLZoqNzB\",\n  \"Ic-iai\":\"1Uvh7h3FSNph37_D-eJqlSo3sfa98s29K\",\n  //primer año\n  \"Ic-progra1\":\"1bM9N-KzV2IG-zhyJgIO-IrJejRS7iC3I\",\n  \"Ic-progra2\":\"1sey8yVyDNSHGqCw6r6M6fhDUV8C-d8HU\",\n  \"Ic-fisica1\":\"1O3KapGYnlqKX-ixTT232VIrh2EkqeZLE\",\n  \"Ic-matea\":\"1FIefzHQSwCoOnnLRzlcF9YDYlzO9pMtV\",\n  \"Ic-mateb\":\"12QF_hTYEsZQq4dqFE_HAPcNuFiNK4INu\",\n  \"Ic-fa\":\"1roMiC0LS9rJ2-NKx7gU6azn9c1iQ_DHo\",\n  // segundo año\n  \"Ic-ac\":\"1UyhpjoZvL2erpfPAjlvdfap1fa-TMI3FdT2d\",\n  \"Ic-cso\":\"10gCHIBiHGlYQbsdB0cQ75zTD_rjM2_Zu\",\n  \"Ic-f2\":\"1kk5HIxosxSD3RL5OvP8E8v_WoKViS2xl\",\n  \"Ic-matec\":\"1k1F3b463sFxjA2YPWfRNJy_Qtk7t0jeA\",\n  \"Ic-mated\":\"1WV6illWvxzDji3cmuAUGNlNM1SeIBWNR\",\n  \"Ic-p3\":\"1FFqpbDl2EPPgjcY4ZwlpDxJuIDfo5iQ2\",\n  \"Ic-tl1\":\"10BWnWssnb1lqdoTbD5I8NLgsUzdhuxH_\",\n  \"Ic-tl2\":\"1J8omYsL5nlcklGMNAhGSU_ReSksTPNSH\",\n  //tercer año \n  \"Ic-cbd\":\"1bLh3LO86OSInx3_SWQ_K69ynY5ZusF6S\",\n  \"Ic-eye\":\"17FZqdhLd-3hmcLAAjZjq45lG_yh4cQFu\",\n  \"Ic-is\":\"1H3SvM73IfWAHqYrUTBde88g4QpygdTaA\",\n  \"Ic-idl\":\"1DoPLS6HF5ZS3MZX-Sju0UuHDz0YhFZgs\",\n  \"Ic-ips\":\"1wSkUodJeN8ErJgELL4Ms-M8pZCyysxpV\",\n  \"Ic-pye\":\"14XUeFC842hu-nX_Kc8mYmqb9ZRnUTtMy\",\n  \"Ic-rd\":\"1L60yU_6UbpTCV-Ny9M43A8LpxL2Z282x\",\n  \"Ic-ta\":\"1gpjgJoLKw3hj7_cWE3AUexPvXpHbk9ra\",\n  //cuarto año\n  \"Ic-bd\":\"1-9K-HDjtNFWA6vqu80WksK6HPwCISOyk\",\n  \"Ic-cdm\":\"14LI2_-fgyLzCrnZ9sTaQOiQlogRE_TKO\",\n  \"Ic-cp\":\"1TBHyMC_tdAviKzvrErnycVunvxNoEthu\",\n  \"Ic-ee\":\"1iM-ZZIpz8tOhlQzx5SkSPU0Y0Fz0ZECp\",\n  \"Ic-ic\":\"1C8ZaZqyJ8lmIf6ftdA0br7rjY4VIuoUR\",\n  \"Ic-rd2\":\"1GqFpBhy8EiHBS0gCc7O6rpa04ognj8vk\",\n  \"Ic-tp\":\"1QPFKCrb1KVD5m2TlY5RJZb1epS4JCxkz\",\n  // quinto año\n  \"Ic-ha\":\"1KohjaRl0HLH-PRwYfbCu7QYwxWWehNrE\",\n  \"Ic-tp2\":\"1eMjhxM3Qg1NI-yfyj2zt89_yk_I4lBL6\",\n  \"Ic-alii\":\"1AeGwrsVA2aSvGSwIWxXt_QRj3iHTNnGt\",\n  \"Ic-hb\":\"1LAI6D470dKep3N4UCMoCxoD3aee7nuUs\",\n  \"Ic-iacc\":\"1A79t2p_CeNb3nQChuo-9TBI5gBFXsGZP\",\n  \"Ic-ipc\":\"1vg1VOLXM8xsbyvoeaGGaQV0yxeKM4QvE\",\n  \"Ic-sdp\":\"1e7VVpUtwTxJ5Sn3FuqdmUvZp0o_lwiNo\",\n};\n// 1. Obtenemos el caption original del nodo de Telegram\nconst captionOriginal = $('Disparador de imagen ').first().json.message.caption;\n\n// 2. Aplicamos la lógica para dividir, recortar y volver a unir\nconst nombreArchivo = captionOriginal.split('-').slice(0, 3).join('-');\nconst nombreArchivo2 = captionOriginal.split('-').slice(0, 2).join('-');\n// 3. Buscamos el ID en tu base de datos (diccionario)\nconst idDestino = BaseDatos[nombreArchivo];\nconst idDestino2 = BaseDatos[nombreArchivo2];\nif (idDestino) {\n  // CLAVE: Modificamos el item actual para NO perder el binario en n8n\n  $input.item.json.id_carpeta_drive = idDestino;\n  return $input.item;\n} else if (idDestino2){\n      $input.item.json.id_carpeta_drive = idDestino2;\n      return $input.item;}\nelse{\n  throw new Error(\"La ruta ingresada (\" + nombreArchivo + \") no existe en la base de datos.\");\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        224
+      ],
+      "id": "dfde5541-05b9-4290-8621-8f52dedd6312",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Disparador de imagen ').item.json.message.chat.id }}",
+        "text": "Subido a la carpeta indicada",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        832,
+        192
+      ],
+      "id": "ba845b17-ff88-4cea-8a42-21fea5f2a4e7",
+      "name": "Send a text message",
+      "webhookId": "6ab8f554-a3e8-4684-ba24-ba434659ae7b",
+      "credentials": {
+        "telegramApi": {
+          "id": "42AtvF8lHRBigGyh",
+          "name": "Bot-Byte-marcaAgua"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "534661a9-8b59-442d-8c40-9d62448a2fbf",
+              "leftValue": "={{ $json.id_carpeta_drive }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "c56c7091-b04b-4823-9df1-699dbed31e42",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        384,
+        224
+      ],
+      "id": "ae4a0c0f-6657-4bee-8bdb-8ab24dc8c00e",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Disparador de imagen ').item.json.message.chat.id }}",
+        "text": "Nombre ingresado sin ruta, reenvie el mensaje",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        608,
+        384
+      ],
+      "id": "66d5543c-7a58-4d2a-984f-e08499194781",
+      "name": "Send a text message1",
+      "webhookId": "a69abded-9fbd-42d4-b0c5-cc8511efcd21",
+      "credentials": {
+        "telegramApi": {
+          "id": "42AtvF8lHRBigGyh",
+          "name": "Bot-Byte-marcaAgua"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fileSelector": "/home/node/.n8n-files/assets/logoByte5.png",
+        "options": {
+          "fileName": "marca_agua",
+          "dataPropertyName": "marca_agua"
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        -736,
+        608
+      ],
+      "id": "caa1b395-0855-4c0b-a16b-bb275b55d9fd",
+      "name": "Leer logo1",
+      "alwaysOutputData": false,
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -512,
+        672
+      ],
+      "id": "e5fcd16e-e629-43fe-b1ed-306edca2bb4a",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { PDFDocument } = require('pdf-lib');\n\n// 1. Obtenemos los bytes puros (Buffer) para no saturar la memoria\nconst pdfBuffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst logoBuffer = await this.helpers.getBinaryDataBuffer(0, 'marca_agua');\n\n// 2. Cargamos el PDF y el Logo en la librería\nconst pdfDoc = await PDFDocument.load(pdfBuffer);\nconst logoImage = await pdfDoc.embedPng(logoBuffer);\n\n// 3. Recorremos todas las páginas\nconst pages = pdfDoc.getPages();\n\nfor (const page of pages) {\n  // Obtenemos el tamaño real de la hoja actual (ej: A4 es 595x842)\n  const { width, height } = page.getSize();\n  \n  // -- MAGIA MATEMÁTICA --\n  // Queremos que el logo ocupe el 60% del ancho de la página\n  const anchoDeseado = width * 0.90; \n  \n  // Calculamos por cuánto hay que multiplicar el logo original para llegar a ese ancho\n  const factorDeEscala = anchoDeseado / logoImage.width;\n  \n  // Aplicamos ese factor. Esto achica el ancho y el alto proporcionalmente para que no se deforme.\n  const logoDims = logoImage.scale(factorDeEscala); \n  // ------------------------\n\n  // Dibujamos el logo calculando el centro exacto de la hoja\n  page.drawImage(logoImage, {\n    x: width / 2 - logoDims.width / 2,\n    y: height / 2 - logoDims.height / 2,\n    width: logoDims.width,\n    height: logoDims.height\n  });\n}\n\n// 4. Guardamos los cambios\nconst pdfBytes = await pdfDoc.save();\n\n// 5. Devolvemos el archivo impecable para n8n\n$input.item.binary = $input.item.binary || {};\n$input.item.binary.Imagen_completa = await this.helpers.prepareBinaryData(Buffer.from(pdfBytes), 'parcial_marcado.pdf', 'application/pdf');\nreturn $input.item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -288,
+        672
+      ],
+      "id": "d0103856-3f09-4c22-9a6f-2c50fd19bb7c",
+      "name": "PonerMarcaDeAguaPDf"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e0ee66c0-839b-4bce-9fa9-ce6998a2b447",
+              "leftValue": "={{ $json.message.caption }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "450b9216-7c10-4158-b1e6-11982a715ece",
+              "leftValue": "={{ $json.message.document.mime_type }}",
+              "rightValue": "=application/pdf",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1856,
+        288
+      ],
+      "id": "2ba06321-9e96-4ade-b1e9-d0b7a9d9f356",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e0ee66c0-839b-4bce-9fa9-ce6998a2b447",
+              "leftValue": "={{ $json.message.document.mime_type }}",
+              "rightValue": "=application/pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "9014c1b5-a24e-45cf-817a-3a95f83693eb",
+              "leftValue": "={{ $json.message.caption }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -960,
+        752
+      ],
+      "id": "fe888c89-a061-4fc6-a616-97a483689a6a",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Disparador de imagen ').item.json.message.chat.id }}",
+        "text": "Tenes que mandar el pdf o la imagen como documento  y la casilla de chat con la ruta.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -736,
+        896
+      ],
+      "id": "abd55b1a-e691-4897-8991-49b3e24308d0",
+      "name": "Send a text message2",
+      "webhookId": "5942bd98-b462-46ed-90c7-b669bd461665",
+      "credentials": {
+        "telegramApi": {
+          "id": "42AtvF8lHRBigGyh",
+          "name": "Bot-Byte-marcaAgua"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const BaseDatos = {\n  // ingreso\n\"Coc\":\"https://discord.com/channels/1171527186172358699/1178940886445473932\",\n\"Epa\":\"https://discord.com/channels/1171527186172358699/1178940853453066303\",\n\"M0\":\"https://discord.com/channels/1171527186172358699/1178940928367542354\",\n\n  // primer año\n\"Cadp\":\"https://discord.com/channels/1171527186172358699/1178951250855854150\",\n\"Ac\":\"https://discord.com/channels/1171527186172358699/1178951682437169202\",\n\"Oc\":\"https://discord.com/channels/1171527186172358699/1178951315389431869\",\n\"M1\":\"https://discord.com/channels/1171527186172358699/1178951473619554305\",\n\"M2\":\"https://discord.com/channels/1171527186172358699/1178951780592254996\",\n\"TP\":\"https://discord.com/channels/1171527186172358699/1178951618310443018\",\n  // segundo año\n\"Ayed\":\"https://discord.com/channels/1171527186172358699/1491492244857950379\",\n\"I1\":\"https://discord.com/channels/1171527186172358699/1491503118662369431\",  \n\"O1\":\"https://discord.com/channels/1171527186172358699/1491502760024215593\",\n\"Fod\":\"https://discord.com/channels/1171527186172358699/1491502577190436894\",\n\"Dbd\":\"https://discord.com/channels/1171527186172358699/1493012155463766088\",\n\"Iso\":\"https://discord.com/channels/1171527186172358699/1491503173553094806\",\n// tercer año\n\"M3\":\"https://discord.com/channels/1171527186172358699/1493011847094341793\",\n\"O2\":\"https://discord.com/channels/1171527186172358699/1493010264449089828\",\n\"Bd1\":\"https://discord.com/channels/1171527186172358699/1493017276595699893\",\n\"Pc\":\"https://discord.com/channels/1171527186172358699/1493017070542131292\",\n\"Ryc\":\"https://discord.com/channels/1171527186172358699/1493016974114947093\",\n\"Cyc\":\"https://discord.com/channels/1171527186172358699/1493017338864210040\",\n\"Cplp\":\"https://discord.com/channels/1171527186172358699/1493016886143877241\",\n  //ATiC orientaciones\n  // Cuarto año\n\"Syo\":\"https://discord.com/channels/1171527186172358699/1503435111633260684\",\n\"So\":\"https://discord.com/channels/1171527186172358699/1503435003818807316\",\n\"Pdtr\":\"https://discord.com/channels/1171527186172358699/1503435700077330492\",\n\"M4\":\"https://discord.com/channels/1171527186172358699/1503435173730058461\",\n\"Li\":\"https://discord.com/channels/1171527186172358699/1503435652857856111\",\n\"I3\":\"https://discord.com/channels/1171527186172358699/1503435076799823953\",\n\"Dssd\":\"https://discord.com/channels/1171527186172358699/1503435210375692368\",\n\"Bd2\":\"https://discord.com/channels/1171527186172358699/1503435044776054834\",\n\"Tcvp\":\"\",  \n\"Ftc\":\"https://discord.com/channels/1171527186172358699/1503434976853757973\",\n  // 5 año\n\"Aes\":\"https://discord.com/channels/1171527186172358699/1503435299106197728\",\n\"As\":\"https://discord.com/channels/1171527186172358699/1503435255783358704\",\n  \n  // Rutas Ciencia de datos\n  //primer año\n  \"Cdo-ayp1\":\"https://discord.com/channels/1171527186172358699/1503444925356838922\",\n  \"Cdo-ayp2\":\"https://discord.com/channels/1171527186172358699/1503444996639031366\",\n  \"Cdo-matea\":\"https://discord.com/channels/1171527186172358699/1503444945040707735\",\n  \"Cdo-mateb\":\"https://discord.com/channels/1171527186172358699/1503445016503124080\",\n  \"Cdo-economia\":\"https://discord.com/channels/1171527186172358699/1503445041564352752\",\n  \"Cdo-gestion\":\"https://discord.com/channels/1171527186172358699/1503444964804263946\",\n  // segundo año\n  \"Cdo-bd\":\"https://discord.com/channels/1171527186172358699/1503445124569370737\",\n  \"Cdo-ci\":\"https://discord.com/channels/1171527186172358699/1503445146262573097\",\n  \"Cdo-ibd\":\"https://discord.com/channels/1171527186172358699/1503445124569370737\",\n  \"Cdo-matec\":\"https://discord.com/channels/1171527186172358699/1503445166361678014\",\n  \"Cdo-mated\":\"https://discord.com/channels/1171527186172358699/1503445292375212202\",\n  \"Cdo-pn\":\"https://discord.com/channels/1171527186172358699/1503445269667381340\",\n  \"Cdo-tl\":\"https://discord.com/channels/1171527186172358699/1503445100556976248\",\n  // tercer año\n  \"cdo-Vgvd\":\"https://discord.com/channels/1171527186172358699/1503445482226323516\",\n  \"cdo-cig\":\"https://discord.com/channels/1171527186172358699/1503445426106531940\",\n  \"cdo-facso\":\"https://discord.com/channels/1171527186172358699/1503445386809839706\",\n  \"cdo-gpe\":\"https://discord.com/channels/1171527186172358699/1503445458150752356\",\n  \"cdo-is\":\"https://discord.com/channels/1171527186172358699/1503445405403320440\",\n  \"cdo-mdaa\":\"https://discord.com/channels/1171527186172358699/1503445527902158969\",\n  \"cdo-tg\":\"https://discord.com/channels/1171527186172358699/1503445527902158969\",\n //cuarto año\n  \"cdo-aido\":\"https://discord.com/channels/1171527186172358699/1503445742675562636\",\n  \"cdo-cabg\":\"https://discord.com/channels/1171527186172358699/1503445617584898099\",\n  \"cdo-dg\":\"https://discord.com/channels/1171527186172358699/1503445765958275203\",\n  \"cdo-etgp\":\"https://discord.com/channels/1171527186172358699/1503445683229819021\",\n  \"cdo-fe\":\"https://discord.com/channels/1171527186172358699/1503445643660627988\",\n  \"cdo-meo\":\"https://discord.com/channels/1171527186172358699/1503445719259025499\",\n\n\n\n\n\n  //Rutas Ingenieria en computación\n  //ingreso\n  \"Ic-matepi\":\"https://discord.com/channels/1171527186172358699/1503443475952046201\",\n  \"Ic-iai\":\"https://discord.com/channels/1171527186172358699/1503443437414776952\",\n  //primer año\n  \"Ic-progra1\":\"https://discord.com/channels/1171527186172358699/1503443558454001884\",\n  \"Ic-progra2\":\"https://discord.com/channels/1171527186172358699/1503443673072013353\",\n  \"Ic-fisica1\":\"https://discord.com/channels/1171527186172358699/1503443651630465244\",\n  \"Ic-matea\":\"https://discord.com/channels/1171527186172358699/1503443514212618268\",\n  \"Ic-mateb\":\"https://discord.com/channels/1171527186172358699/1503443623880953977\",\n  \"Ic-fa\":\"https://discord.com/channels/1171527186172358699/1503443592331395076\",\n  // segundo año\n \"Ic-ac\":\"https://discord.com/channels/1171527186172358699/1503443785806254161\",\n  \"Ic-cso\":\"https://discord.com/channels/1171527186172358699/1503443855876427906\",\n  \"Ic-f2\":\"https://discord.com/channels/1171527186172358699/1503443807650185327\",\n  \"Ic-matec\":\"https://discord.com/channels/1171527186172358699/1503443706752008302\",\n  \"Ic-mated\":\"1WV6illWvxzDji3cmuAUGNlNM1SeIBWNR\",\n  \"Ic-p3\":\"https://discord.com/channels/1171527186172358699/1503443727484583936\",\n  \"Ic-tl1\":\"https://discord.com/channels/1171527186172358699/1503443752331509901\",\n  \"Ic-tl2\":\"http://discord.com/channels/1171527186172358699/1503443878198509628\",\n  //tercer año \n  \"Ic-cbd\":\"https://discord.com/channels/1171527186172358699/1503443976236306443\",\n  \"Ic-eye\":\"https://discord.com/channels/1171527186172358699/1503443914932097144\",\n  \"Ic-is\":\"https://discord.com/channels/1171527186172358699/1503444110298714192\",\n  \"Ic-idl\":\"https://discord.com/channels/1171527186172358699/1503443931436814346\",\n  \"Ic-ips\":\"https://discord.com/channels/1171527186172358699/1503444044154540304\",\n  \"Ic-pye\":\"https://discord.com/channels/1171527186172358699/1503443955742675146\",\n  \"Ic-rd\":\"https://discord.com/channels/1171527186172358699/1503444064337530880\",\n  \"Ic-ta\":\"https://discord.com/channels/1171527186172358699/1503444083388186626\",\n  //cuarto año\n  \"Ic-bd\":\"https://discord.com/channels/1171527186172358699/1503444274929209535\",\n  \"Ic-cdm\":\"https://discord.com/channels/1171527186172358699/1503444175302037625\",\n  \"Ic-cp\":\"https://discord.com/channels/1171527186172358699/1503444195459989587\",\n  \"Ic-ee\":\"https://discord.com/channels/1171527186172358699/1503444228259450983\",\n  \"Ic-ic\":\"https://discord.com/channels/1171527186172358699/1503444149553074418\",\n  \"Ic-rd2\":\"https://discord.com/channels/1171527186172358699/1503444295238156448\",\n  \"Ic-tp\":\"https://discord.com/channels/1171527186172358699/1503444253433401394\",\n  // quinto año\n  \"Ic-ha\":\"https://discord.com/channels/1171527186172358699/1523810832767520878\",\n  \"Ic-tp2\":\"https://discord.com/channels/1171527186172358699/1503444425827815435\",\n  \"Ic-alii\":\"https://discord.com/channels/1171527186172358699/1503444404252180480\",\n  \"Ic-hb\":\"https://discord.com/channels/1171527186172358699/1523810887025164361\",\n  \"Ic-iacc\":\"https://discord.com/channels/1171527186172358699/1503444366432407663\",\n  \"Ic-ipc\":\"https://discord.com/channels/1171527186172358699/1503444447885660200\",\n  \"Ic-sdp\":\"https://discord.com/channels/1171527186172358699/1503444385453314188\",\n};\n// 1. Obtenemos el caption original del nodo de Telegram\nconst captionOriginal = $('Disparador de imagen ').first().json.message.caption;\n\n// 2. Aplicamos la lógica para dividir, recortar y volver a unir\nconst nombreArchivo = captionOriginal.split('-')[0];\nconst nombreArchivo2 = captionOriginal.split('-').slice(0, 1).join('-');\n// 3. Buscamos el ID en tu base de datos (diccionario)\nconst idDestino = BaseDatos[nombreArchivo];\nconst idDestino2 = BaseDatos[nombreArchivo2];\nif ($input.item.binary && $input.item.binary.Imagen_completa) {\n    $input.item.binary.Imagen_completa.fileName = captionOriginal + \".png\";\n  }\nif (idDestino) {\n  // CLAVE: Modificamos el item actual para NO perder el binario en n8n\n  $input.item.json.url_webhook_discord = idDestino;\n  return $input.item;\n} else if (idDestino2){\n      $input.item.json.url_webhook_discord = idDestino2;\n      return $input.item;}\nelse{\n  throw new Error(\"La ruta ingresada (\" + nombreArchivo + \") no existe en la base de datos.\");\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -64,
+        464
+      ],
+      "id": "6048bfa5-4896-4432-8b5c-c2335e33a170",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1171527186172358699",
+          "mode": "list",
+          "cachedResultName": "Byte",
+          "cachedResultUrl": "https://discord.com/channels/1171527186172358699"
+        },
+        "channelId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "={{ $json.url_webhook_discord }}",
+          "__regex": "https:\\/\\/discord.com\\/channels\\/[0-9]+\\/([0-9]+)"
+        },
+        "content": "Nuevo material subido al Drive! 📚",
+        "options": {},
+        "files": {
+          "values": [
+            {
+              "inputFieldName": "Imagen_completa"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        160,
+        480
+      ],
+      "id": "79fd41a8-9f25-4a5c-a1f8-a8e56c76d5e2",
+      "name": "Send a message",
+      "webhookId": "7b492c64-a12e-4fb1-82b5-1e3e50d4713e",
+      "credentials": {
+        "discordBotApi": {
+          "id": "dRCYCcoEe5tVkQyR",
+          "name": "BotParciales-byte"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Cambio la resolucion del logo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Disparador de imagen ": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer logo": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Info de la imagen de telegram": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Cambio la resolucion del logo": {
+      "main": [
+        [
+          {
+            "node": "Logo e imagen",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "PegoLogoArribaDeParcial": {
+      "main": [
+        [
+          {
+            "node": "ConTexto o no",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Archivo listo",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "ConTexto o no": {
+      "main": [
+        [
+          {
+            "node": "Escribir el archivo temporal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Archivo listo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escribir el archivo temporal": {
+      "main": [
+        [
+          {
+            "node": "Mensaje pidiendo nombre",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Logo e imagen": {
+      "main": [
+        [
+          {
+            "node": "PegoLogoArribaDeParcial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Archivo listo": {
+      "main": [
+        [
+          {
+            "node": "Escritura en diso con nombre asignado",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escritura en diso con nombre asignado": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer logo1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "PonerMarcaDeAguaPDf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PonerMarcaDeAguaPDf": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Leer logo",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Info de la imagen de telegram",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Logo e imagen",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Leer logo1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "6c08b94c-9193-455a-884a-e3a9a063b3d3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f3112af28580801671cf950206b6a139ddebb68a03d5641d5e2e4395cbd0ab66"
+  },
+  "nodeGroups": [],
+  "id": "SoJacMNOMVC6PMtE",
+  "tags": []
+}
